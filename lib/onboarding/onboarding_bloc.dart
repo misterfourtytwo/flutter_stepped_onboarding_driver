@@ -47,9 +47,9 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) async* {
     if (state is OnboardingStateInitial) {
       yield OnboardingStateLoading();
+      // otherwise prev yield do not change bloc state
       await Future.value(null);
 
-      // await Future.delayed(Duration(seconds: 0));
       final Map<int, bool> flags = OnboardingDataDao().getFlagsMap();
       int currentStep = onboardingStepsCnt;
       for (int i = onboardingStepsCnt - 1; i >= 0; i--) {
@@ -78,13 +78,12 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     OnboardingState state,
     OnboardingEventOpenStep event,
   ) async* {
-    if (state is OnboardingStateAwaitingStep) {
-      // if (state.currentStep == event.step) {
+    if (state is OnboardingStateAwaitingStep &&
+        state.currentStep == event.step) {
       yield OnboardingStateStepInProgress(
         flags: state.flags,
         currentStep: state.currentStep,
       );
-      // }
     }
   }
 
@@ -93,20 +92,19 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     OnboardingEventStepShown event,
   ) async* {
     if (state is OnboardingStateStepInProgress) {
-      await OnboardingDataDao().setStep(step: state.currentStep);
       if (state.currentStep == event.step) {
-        {
-          if (event.step + 1 < onboardingStepsCnt) {
-            yield OnboardingStateAwaitingStep(
-              flags: OnboardingDataDao().getFlagsMap(),
-              currentStep: event.step + 1,
-            );
-          } else {
-            yield OnboardingStateAllStepsShown(
-              flags: OnboardingDataDao().getFlagsMap(),
-              currentStep: onboardingStepsCnt,
-            );
-          }
+        await OnboardingDataDao().setStep(step: event.step);
+
+        if (event.step + 1 < onboardingStepsCnt) {
+          yield OnboardingStateAwaitingStep(
+            flags: OnboardingDataDao().getFlagsMap(),
+            currentStep: event.step + 1,
+          );
+        } else {
+          yield OnboardingStateAllStepsShown(
+            flags: OnboardingDataDao().getFlagsMap(),
+            currentStep: onboardingStepsCnt,
+          );
         }
       }
     }

@@ -33,66 +33,79 @@ class OnboardingStepWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OnboardingBloc, OnboardingState>(
-      // listener: (context, state) {
-      //   print(state);
-      //   if (state is OnboardingStateAwaitingStep && state.currentStep == step)
-      //     BlocProvider.of<OnboardingBloc>(context).add(
-      //       OnboardingEventOpenStep(step),
-      //     );
-      // },
-      // buildWhen: (oldState, newState) {
-      // return false;
-      // print(
-      //   'state changed: ${oldState.runtimeType} -> ${newState.runtimeType}',
-      // );
-      // return (oldState is OnboardingStateAwaitingStep &&
-      //         oldState.currentStep == step) ||
-      //     (oldState is OnboardingStateStepInProgress &&
-      //         oldState.currentStep == step);
-      // },
-      builder: (BuildContext context, OnboardingState state) {
-        print('step $step blocBuilder rebuild');
-        print('update bloc state: ${state.runtimeType}');
-        bool showPortal =
-            state is OnboardingStateStepInProgress && state.currentStep == step;
-        print('show Portal: $showPortal');
+    return BlocConsumer<OnboardingBloc, OnboardingState>(
+      listener: (context, state) {
         if (state is OnboardingStateInitial) {
-          print('launching load event');
           BlocProvider.of<OnboardingBloc>(context).add(OnboardingEventLoad());
         } else if (state is OnboardingStateAwaitingStep &&
             state.currentStep == step) {
-          BlocProvider.of<OnboardingBloc>(context).add(
-            OnboardingEventOpenStep(step),
-          );
+          BlocProvider.of<OnboardingBloc>(context)
+              .add(OnboardingEventOpenStep(step));
         }
+      },
+      buildWhen: (oldState, newState) {
+        return oldState is OnboardingStateLoaded &&
+            oldState.currentStep == step;
+      },
+      builder: (BuildContext context, OnboardingState state) {
+        bool showPortal =
+            state is OnboardingStateStepInProgress && state.currentStep == step;
+        print('step $step blocBuilder rebuild');
+        print('update bloc state: ${state.runtimeType}');
+        print('show Portal: $showPortal');
 
         return PortalEntry(
-          portal: Container(
-              height: 240,
-              width: 240,
-              decoration: BoxDecoration(
-                color: Color(0xFFFFFFFF),
-                shape: BoxShape.circle,
-              ),
-              child: Row(
-                children: [
-                  FlatButton(
-                    color: Color(0xFF0000FF),
-                    child: Text('skip'),
-                    onPressed: () => _onClose(context),
-                  ),
-                  OutlineButton(
-                    color: Color(0xFF00FFFF),
-                    child: Text('continue'),
-                    onPressed: () => _onContinue(context),
-                  )
-                ],
-              )),
-          portalAnchor: Alignment.center,
+          portalAnchor: Alignment.bottomCenter,
           visible: showPortal,
-          childAnchor: Alignment.center,
+          childAnchor: Alignment.topCenter,
           child: child,
+          portal: Builder(
+            builder: (BuildContext context) {
+              return WillPopScope(
+                onWillPop: () async {
+                  return false;
+                },
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Positioned.fill(
+                    //     child: Container(
+                    //   color: Colors.red,
+                    // )),
+                    //
+                    Align(
+                      child: Container(
+                        height: 240,
+                        width: 240,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFFFFFF),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: FlatButton(
+                                color: Colors.blue[200],
+                                child: Text('skip'),
+                                onPressed: () => _onClose(context),
+                              ),
+                            ),
+                            SizedBox(width: 20),
+                            Expanded(
+                              child: FlatButton(
+                                color: Colors.green[200],
+                                child: Text('continue'),
+                                onPressed: () => _onContinue(context),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         );
       },
     );
