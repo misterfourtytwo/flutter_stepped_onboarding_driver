@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> {
                         right: 5,
                         height: 20,
                         width: 20,
-                        child: index == 2
+                        child: index == 1
                             ? OnboardingStepWrapper(
                                 step: 1,
                                 child: InkWell(
