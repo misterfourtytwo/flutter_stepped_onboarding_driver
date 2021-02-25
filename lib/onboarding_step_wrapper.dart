@@ -52,16 +52,21 @@ class OnboardingStepWrapper extends StatelessWidget {
       //         oldState.currentStep == step);
       // },
       builder: (BuildContext context, OnboardingState state) {
+        print('step $step blocBuilder rebuild');
+        print('update bloc state: ${state.runtimeType}');
         bool showPortal =
             state is OnboardingStateStepInProgress && state.currentStep == step;
         print('show Portal: $showPortal');
         if (state is OnboardingStateInitial) {
+          print('launching load event');
           BlocProvider.of<OnboardingBloc>(context).add(OnboardingEventLoad());
         } else if (state is OnboardingStateAwaitingStep &&
-            state.currentStep == step)
+            state.currentStep == step) {
           BlocProvider.of<OnboardingBloc>(context).add(
             OnboardingEventOpenStep(step),
           );
+        }
+
         return PortalEntry(
           portal: Container(
               height: 240,

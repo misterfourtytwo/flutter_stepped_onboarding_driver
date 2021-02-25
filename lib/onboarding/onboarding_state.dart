@@ -21,18 +21,6 @@ abstract class OnboardingStateLoaded extends OnboardingState {
     Map<int, bool> flags,
     int currentStep,
   });
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is OnboardingStateLoaded &&
-        mapEquals(other.flags, flags) &&
-        other.currentStep == currentStep;
-  }
-
-  @override
-  int get hashCode => flags.hashCode ^ currentStep.hashCode;
 }
 
 class OnboardingStateStepInProgress extends OnboardingStateLoaded {
@@ -53,6 +41,18 @@ class OnboardingStateStepInProgress extends OnboardingStateLoaded {
       currentStep: currentStep ?? this.currentStep,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is OnboardingStateStepInProgress &&
+        mapEquals(other.flags, flags) &&
+        other.currentStep == currentStep;
+  }
+
+  @override
+  int get hashCode => flags.hashCode ^ currentStep.hashCode;
 }
 
 class OnboardingStateAllStepsShown extends OnboardingStateLoaded {
@@ -73,6 +73,18 @@ class OnboardingStateAllStepsShown extends OnboardingStateLoaded {
       currentStep: currentStep ?? this.currentStep,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is OnboardingStateAllStepsShown &&
+        mapEquals(other.flags, flags) &&
+        other.currentStep == currentStep;
+  }
+
+  @override
+  int get hashCode => flags.hashCode ^ currentStep.hashCode;
 }
 
 class OnboardingStateAwaitingStep extends OnboardingStateLoaded {
@@ -93,4 +105,16 @@ class OnboardingStateAwaitingStep extends OnboardingStateLoaded {
       currentStep: currentStep ?? this.currentStep,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is OnboardingStateAwaitingStep &&
+        mapEquals(other.flags, flags) &&
+        other.currentStep == currentStep;
+  }
+
+  @override
+  int get hashCode => flags.hashCode ^ currentStep.hashCode;
 }

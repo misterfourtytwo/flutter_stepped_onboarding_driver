@@ -23,3 +23,7 @@ class OnboardingEventStepShown extends OnboardingEvent {
 
   const OnboardingEventStepShown(this.step);
 }
+
+class OnboardingEventReset extends OnboardingEvent {
+  const OnboardingEventReset();
+}

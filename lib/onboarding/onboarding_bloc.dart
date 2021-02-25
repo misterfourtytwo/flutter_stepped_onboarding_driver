@@ -11,23 +11,33 @@ const int onboardingStepsCnt = 6;
 
 class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   OnboardingBloc() : super(OnboardingStateInitial());
+  @override
+  void onTransition(Transition<OnboardingEvent, OnboardingState> transition) {
+    print('onboarding bloc: ${transition.toString()}');
+    super.onTransition(transition);
+  }
 
   @override
   Stream<OnboardingState> mapEventToState(
     OnboardingEvent event,
   ) async* {
-    print(event);
-    print(state);
     if (event is OnboardingEventLoad) {
+      print('onboarding bloc: got  event ${event.runtimeType}');
       yield* _handleLoad(this.state, event);
     } else if (event is OnboardingEventOpenStep) {
+      print('onboarding bloc: got  event ${event.runtimeType}');
       yield* _handleOpenStep(this.state, event);
     } else if (event is OnboardingEventStepShown) {
+      print('onboarding bloc: got  event ${event.runtimeType}');
       yield* _handleStepShown(this.state, event);
     } else if (event is OnboardingEventClose) {
+      print('onboarding bloc: got  event ${event.runtimeType}');
       yield* _handleClose(this.state, event);
+    } else if (event is OnboardingEventReset) {
+      print('onboarding bloc: got  event ${event.runtimeType}');
+      yield* _handleReset(this.state, event);
     } else {
-      print('got unknown event ${event.runtimeType}');
+      print('onboarding bloc: got unknown event ${event.runtimeType}');
     }
   }
 
@@ -37,7 +47,9 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) async* {
     if (state is OnboardingStateInitial) {
       yield OnboardingStateLoading();
+      await Future.value(null);
 
+      // await Future.delayed(Duration(seconds: 0));
       final Map<int, bool> flags = OnboardingDataDao().getFlagsMap();
       int currentStep = onboardingStepsCnt;
       for (int i = onboardingStepsCnt - 1; i >= 0; i--) {
@@ -46,18 +58,18 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
         currentStep = i;
       }
 
-      // if (this.state is OnboardingStateLoading) {
-      if (currentStep != onboardingStepsCnt) {
-        yield OnboardingStateAwaitingStep(
-          flags: flags,
-          currentStep: currentStep,
-        );
-      } else {
-        yield OnboardingStateAllStepsShown(
-          flags: flags,
-          currentStep: onboardingStepsCnt,
-        );
-        // }
+      if (this.state is OnboardingStateLoading) {
+        if (currentStep != onboardingStepsCnt) {
+          yield OnboardingStateAwaitingStep(
+            flags: flags,
+            currentStep: currentStep,
+          );
+        } else {
+          yield OnboardingStateAllStepsShown(
+            flags: flags,
+            currentStep: onboardingStepsCnt,
+          );
+        }
       }
     }
   }
@@ -110,5 +122,16 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     OnboardingDataDao().setFlagsMap(flags);
     yield OnboardingStateAllStepsShown(
         currentStep: onboardingStepsCnt, flags: flags);
+  }
+
+  Stream<OnboardingState> _handleReset(
+    OnboardingState state,
+    OnboardingEvent event,
+  ) async* {
+    final Map<int, bool> flags = <int, bool>{
+      for (int i = 0; i < onboardingStepsCnt; i++) i: false,
+    };
+    OnboardingDataDao().setFlagsMap(flags);
+    yield OnboardingStateInitial();
   }
 }

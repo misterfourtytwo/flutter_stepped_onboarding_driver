@@ -21,19 +21,19 @@ class OnboardingDataDao {
         customBox ?? await Hive.openBox(_defaultBoxName);
   }
 
-  Future<void> setStep({@required int step, bool value = true}) async {
-    await _onboardingDataBox.put(step, value);
-  }
-
   bool getStep({@required int step}) {
     return _onboardingDataBox.get(step, defaultValue: false);
   }
 
-  Future<void> setFlagsMap(Map<int, bool> map) async {
-    await _onboardingDataBox.putAll(map);
+  Future<void> setStep({@required int step, bool value = true}) async {
+    await _onboardingDataBox.put(step, value);
   }
 
   Map<int, bool> getFlagsMap() {
     return Map<int, bool>.from(_onboardingDataBox.toMap());
+  }
+
+  Future<void> setFlagsMap(Map<int, bool> map) async {
+    await _onboardingDataBox.putAll(map);
   }
 }
