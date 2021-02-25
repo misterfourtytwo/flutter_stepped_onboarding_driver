@@ -102,12 +102,16 @@ class _HomePageState extends State<HomePage> {
                         child: index == 1
                             ? OnboardingStepWrapper(
                                 step: 1,
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).pushNamed('second');
-                                  },
-                                  child: Container(
-                                    color: Colors.amber,
+                                child: SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed('second');
+                                    },
+                                    child: Container(
+                                      color: Colors.amber,
+                                    ),
                                   ),
                                 ),
                               )
@@ -141,6 +145,7 @@ class _HomePageState extends State<HomePage> {
         ],
       )),
       bottomNavigationBar: BottomNavigationBar(
+        showUnselectedLabels: true,
         currentIndex: activeIndex,
         onTap: (int newIndex) {
           if (newIndex != activeIndex) {
@@ -180,8 +185,12 @@ class _HomePageState extends State<HomePage> {
             label: '3',
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.mediation,
+            icon: Column(
+              children: [
+                Icon(
+                  Icons.mediation,
+                ),
+              ],
             ),
             label: '4',
           ),
@@ -231,6 +240,8 @@ class SecondPage extends StatelessWidget {
                           },
                           step: 4,
                           child: Container(
+                            height: 24,
+                            width: 24,
                             color: Colors.amber[800],
                           ),
                         )
